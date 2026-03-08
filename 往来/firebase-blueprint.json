@@ -1,0 +1,91 @@
+{
+  "entities": {
+    "Friend": {
+      "title": "Friend",
+      "description": "A friend or contact of the user",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who owns this friend record"
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the friend"
+        },
+        "relation": {
+          "type": "string",
+          "description": "Relationship with the user"
+        },
+        "avatar": {
+          "type": "string",
+          "description": "Avatar URL"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Notes about the friend"
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "type": { "type": "string" },
+              "date": { "type": "string" },
+              "budget": { "type": "number" }
+            }
+          }
+        }
+      },
+      "required": ["userId", "name", "relation"]
+    },
+    "Record": {
+      "title": "Record",
+      "description": "A gift record sent or received",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "The ID of the user who owns this record"
+        },
+        "title": {
+          "type": "string",
+          "description": "Title of the gift"
+        },
+        "personId": {
+          "type": "string",
+          "description": "ID of the friend"
+        },
+        "date": {
+          "type": "string",
+          "description": "Date of the record"
+        },
+        "price": {
+          "type": "number",
+          "description": "Price of the gift"
+        },
+        "type": {
+          "type": "string",
+          "enum": ["送出", "收到", "sent", "received"],
+          "description": "Type of record"
+        },
+        "img": {
+          "type": "string",
+          "description": "Image URL of the gift"
+        }
+      },
+      "required": ["userId", "title", "personId", "date", "price", "type"]
+    }
+  },
+  "firestore": {
+    "friends/{friendId}": {
+      "schema": { "$ref": "#/entities/Friend" },
+      "description": "Stores friends for all users"
+    },
+    "records/{recordId}": {
+      "schema": { "$ref": "#/entities/Record" },
+      "description": "Stores gift records for all users"
+    }
+  }
+}

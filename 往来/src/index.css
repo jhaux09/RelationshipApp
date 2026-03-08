@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #ee7c2b;
+  --color-secondary: #d44a32;
+  --color-accent: #eab308;
+  --color-background-light: #f8f7f6;
+  --color-background-dark: #221810;
+  --color-warm-gray: #897261;
+  --color-sepia-900: #181411;
+  --color-sepia-100: #f4f2f0;
+
+  --font-display: "Newsreader", serif;
+  --font-sans: "Newsreader", serif; /* Using Newsreader as main font for retro feel */
+}
+
+@layer base {
+  body {
+    @apply bg-background-light text-slate-900 font-sans antialiased;
+    min-height: max(884px, 100dvh);
+  }
+
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+  
+  .filled-icon {
+    font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  }
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.polaroid-shadow {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.retro-paper {
+  background-color: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(2px);
+  border: 1px solid rgba(238, 124, 43, 0.1);
+}

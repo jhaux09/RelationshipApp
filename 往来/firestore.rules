@@ -1,0 +1,88 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model
+    // ===============================================================
+    //
+    // Collection: friends
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required) - Owner UID
+    //   - name: string (required, max 100) - Friend's name
+    //   - relation: string (required, max 50) - Relationship
+    //   - avatar: string (optional) - Avatar URL
+    //   - notes: string (optional) - Notes
+    //   - events: list (optional) - Important dates
+    //
+    // Collection: records
+    // Document ID: auto-generated
+    // Fields:
+    //   - userId: string (required) - Owner UID
+    //   - title: string (required, max 200) - Gift title
+    //   - personId: string (required) - Friend ID
+    //   - date: string (required) - Date of record
+    //   - price: number (required, >= 0) - Price
+    //   - type: string (required, enum) - sent/received
+    //   - img: string (optional) - Image URL
+    //
+    // ===============================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function uidNotModified() {
+      return !('userId' in request.resource.data) || request.resource.data.userId == resource.data.userId;
+    }
+
+    function hasRequiredFriendFields() {
+      return request.resource.data.keys().hasAll(['userId', 'name', 'relation']);
+    }
+
+    function isValidFriend() {
+      return hasRequiredFriendFields() &&
+        request.resource.data.userId is string &&
+        request.resource.data.name is string &&
+        request.resource.data.name.size() > 0 &&
+        request.resource.data.name.size() <= 100 &&
+        request.resource.data.relation is string &&
+        request.resource.data.relation.size() <= 50;
+    }
+
+    function hasRequiredRecordFields() {
+      return request.resource.data.keys().hasAll(['userId', 'title', 'personId', 'date', 'price', 'type']);
+    }
+
+    function isValidRecord() {
+      return hasRequiredRecordFields() &&
+        request.resource.data.userId is string &&
+        request.resource.data.title is string &&
+        request.resource.data.title.size() > 0 &&
+        request.resource.data.title.size() <= 200 &&
+        request.resource.data.personId is string &&
+        request.resource.data.date is string &&
+        request.resource.data.price is number &&
+        request.resource.data.price >= 0 &&
+        request.resource.data.type in ['送出', '收到', 'sent', 'received'];
+    }
+
+    match /friends/{friendId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isValidFriend() && request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(resource.data.userId) && isValidFriend() && uidNotModified();
+      allow delete: if isOwner(resource.data.userId);
+    }
+
+    match /records/{recordId} {
+      allow read: if isOwner(resource.data.userId);
+      allow create: if isAuthenticated() && isValidRecord() && request.resource.data.userId == request.auth.uid;
+      allow update: if isOwner(resource.data.userId) && isValidRecord() && uidNotModified();
+      allow delete: if isOwner(resource.data.userId);
+    }
+  }
+}
